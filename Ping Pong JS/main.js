@@ -20,6 +20,25 @@
     }
 })();
 
+// propiedades del objeto pelota
+(function(){
+    self.Ball = function(x,y,radius,board){
+     this.x = x;
+     this.y = y;
+     this.radius = radius;
+     this.speed_y = 0;
+     this.speed_x = 3;
+     this.board = board;
+     this.direction = 1;
+     this.bounce_angle = 0;
+     this.max_bounce_angle = Math.PI / 12;
+     this.speed = 3;
+   
+     board.ball = this;
+     this.kind = "circle";
+    }
+});
+
 //función que dibuja las barras que interactuan con la pelota
 (function () {
     self.Bar = function (x, y, width, height, board) {
@@ -29,7 +48,7 @@
         this.height = height;
         this.board = board;
         this.board.bars.push(this);
-        this.kind = "rectangle";
+        this.kind = "circle ";
         this.speed = 10;
     }
 
@@ -43,10 +62,12 @@
             this.y -= this.speed;
         },
         toString: function () {
-            return "x: "+ this.x +"y: "+ this.y;
+            return "x: " + this.x + "y: " + this.y;
         }
     }
 })();
+
+
 
 (function () {
     self.BoardView = function (canvas, board) {
@@ -59,35 +80,47 @@
 
 
     self.BoardView.prototype = {
+        clean: function () {
+            this.cxt.clearRect(0, 0, this.board.width, this.board.height);
+        },
         draw: function () {
-            for (var i = board.elements.length - 1; i >= 0; i--) {
-                const element = array[index];
-                var el = board.elements[i];
+            for (var i = this.board.elements.length - 1; i >= 0; i--) {
+                var el = this.board.elements[i];
                 draw(this.cxt, el)
             };
+        },
+        play: function () {
+            this.draw();
+            this.clean();
+
         }
     }
-
     function draw(cxt, element) {
-        if (element !== null && element.hasOwnProperty("kind")) {
-            switch (element.kind) {
-                case "rectangle":
-                    cxt.fillRect(element.x, element.y, element.width, element.height);
-                    break;
 
-
-            }
+        switch (element.kind) {
+            case "rectangle":
+                cxt.fillRect(element.x, element.y, element.width, element.height);
+                break;
+            case "circle":
+                cxt.beginPath();
+                cxt.arc(element.x, element.y, element.radius, 0, 7);
+                cxt.fill();
+                cxt.closePath();
+                break;
 
         }
+
+
     }
 
 })();
 
 var board = new Board(800, 400);
 var bar = new Bar(20, 100, 40, 100, board)
-var bar = new Bar(735, 100, 40, 100, board)
+var bar2 = new Bar(735, 100, 40, 100, board)
 var canvas = document.getElementById("canvas");
-var board_view = new BoardView("canvas", board);
+var board_view = new BoardView(canvas, board);
+var ball = new ball(350, 100, 10, board);
 
 document.addEventListener("keydown", function (ev) {
     if (ev.keyCode == 87) {
@@ -99,4 +132,23 @@ document.addEventListener("keydown", function (ev) {
         ev.preventDefault();
         bar.down();
     }
+    else if (ev.keyCode == 68) {
+        ev.preventDefault();
+        bar_2.up();
+    }
+    else if (ev.keyCode == 90) {
+        ev.preventDefault();
+        bar_2.down();
+    }
+    else if (ev.keyCode === 32) {
+        ev.preventDefault();
+        board.playing = !board.playing;
+    }
 })
+
+self.addEventListener("load", controller);
+
+function controller() {
+    board_view.play();
+    window.requestAnimationFrame(main);
+}
