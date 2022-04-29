@@ -21,21 +21,29 @@
 })();
 
 // propiedades del objeto pelota
-(function(){
-    self.Ball = function(x,y,radius,board){
-     this.x = x;
-     this.y = y;
-     this.radius = radius;
-     this.speed_y = 0;
-     this.speed_x = 3;
-     this.board = board;
-     this.direction = 1;
-     this.bounce_angle = 0;
-     this.max_bounce_angle = Math.PI / 12;
-     this.speed = 3;
-   
-     board.ball = this;
-     this.kind = "circle";
+(function () {
+    self.Ball = function (x, y, radius, board) {
+        this.x = x;
+        this.y = y;
+        this.radius = radius;
+        this.speed_y = 0;
+        this.speed_x = 3;
+        this.board = board;
+        this.direction = 1;
+        this.bounce_angle = 0;
+        this.max_bounce_angle = Math.PI / 12;
+        this.speed = 3;
+
+        board.ball = this;
+        this.kind = "circle";
+    }
+
+    self.Ball.prototype = {
+        move: function () {
+            this.x += (this.speed_x * this.direction);
+            this.y += (this.speed_y);
+
+        }
     }
 });
 
@@ -90,8 +98,12 @@
             };
         },
         play: function () {
-            this.draw();
-            this.clean();
+            if (this.board.playing()) {
+                this.draw();
+                this.clean();
+                this.board.ball.move();
+            }
+
 
         }
     }
@@ -145,6 +157,7 @@ document.addEventListener("keydown", function (ev) {
         board.playing = !board.playing;
     }
 })
+board_view.draw();
 
 self.addEventListener("load", controller);
 
